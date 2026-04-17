@@ -23,12 +23,12 @@ jobs:
           python-version: '3.12'
 
       - name: Install dependencies
-        run: pip install openai requests
+        run: pip install anthropic requests
 
       - name: Generate release notes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: python .github/scripts/generate_release_notes.py
