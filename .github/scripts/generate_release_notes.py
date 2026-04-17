@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-Generate release notes for a GitHub issue using Google Gemini AI.
+Generate release notes for a GitHub issue using the OpenAI API.
 Triggered by the generate-release-notes GitHub Actions workflow when an issue
 is labeled with 'needs-documentation'.
 
 Workflow:
   1. Fetch issue body, comments, and related commits
   2. Determine target version from milestone or pom.xml
-  3. Call Gemini to draft an AsciiDoc entry in the project's house style
+  3. Call OpenAI to draft an AsciiDoc entry in the project's house style
   4. Insert the entry into the appropriate release notes file(s)
   5. Open a PR on a dedicated branch for human review
   6. Swap labels: remove 'needs-documentation', add 'needs-documentation-confirmed'
@@ -20,14 +20,13 @@ import subprocess
 import sys
 from pathlib import Path
 
-from google import genai
-from google.genai import types as genai_types
+from openai import OpenAI
 import requests
 
 # ── Configuration ──────────────────────────────────────────────────────────────
 
-GITHUB_TOKEN    = os.environ["GITHUB_TOKEN"]
-GOOGLE_AI_API_KEY = os.environ["GOOGLE_AI_API_KEY"]
+GITHUB_TOKEN  = os.environ["GITHUB_TOKEN"]
+OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 ISSUE_NUMBER    = int(os.environ["ISSUE_NUMBER"])
 REPO              = os.environ["GITHUB_REPOSITORY"]   # "owner/repo"
 
@@ -254,7 +253,7 @@ def insert_entry(content: str, version: str, section_name: str, entry: str) -> s
         return content.rstrip() + new_section
 
 
-# ── Gemini integration ────────────────────────────────────────────────────────
+# ── OpenAI integration ────────────────────────────────────────────────────────
 
 _SYSTEM_PROMPT = """\
 You are a technical writer generating release notes for Dodeca, a spreadsheet
@@ -274,7 +273,7 @@ Determine whether the change belongs in:
 """
 
 
-def call_gemini(
+def call_openai(
     issue:             dict,
     comments:          list,
     commits:           list[str],
@@ -283,7 +282,7 @@ def call_gemini(
     version:           str,
 ) -> dict:
     """
-    Ask Gemini to generate a structured JSON with the release notes entry.
+    Ask OpenAI to generate a structured JSON with the release notes entry.
 
     Returns a dict like:
     {
@@ -291,7 +290,7 @@ def call_gemini(
       "addin":     {"applicable": false}
     }
     """
-    client = genai.Client(api_key=GOOGLE_AI_API_KEY)
+    client = OpenAI(api_key=OPENAI_API_KEY)
 
     labels_str   = ", ".join(lb["name"] for lb in issue.get("labels", [])) or "none"
     comments_str = "\n\n".join(
@@ -344,14 +343,15 @@ Return ONLY a JSON object — no markdown fences, no explanation:
 
 If applicable is false, omit section_name and entry for that product."""
 
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        contents=prompt,
-        config=genai_types.GenerateContentConfig(
-            system_instruction=_SYSTEM_PROMPT,
-        ),
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": _SYSTEM_PROMPT},
+            {"role": "user",   "content": prompt},
+        ],
+        max_tokens=1024,
     )
-    text = response.text.strip()
+    text = response.choices[0].message.content.strip()
     # Strip markdown code fences if the model wraps the JSON anyway
     text = re.sub(r"^```\w*\n?", "", text)
     text = re.sub(r"\n?```$", "", text.strip())
@@ -464,8 +464,8 @@ def main() -> None:
         update_labels()
         sys.exit(0)
 
-    print("Calling Gemini to generate release notes…")
-    generated = call_gemini(issue, comments, commits, fw_content, addin_content, version)
+    print("Calling OpenAI to generate release notes…")
+    generated = call_openai(issue, comments, commits, fw_content, addin_content, version)
     print("Claude response:\n" + json.dumps(generated, indent=2))
 
     fw_result   = generated.get("framework", {})

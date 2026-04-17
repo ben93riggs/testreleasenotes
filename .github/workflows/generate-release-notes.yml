@@ -23,12 +23,12 @@ jobs:
           python-version: '3.12'
 
       - name: Install dependencies
-        run: pip install google-genai requests
+        run: pip install openai requests
 
       - name: Generate release notes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GOOGLE_AI_API_KEY: ${{ secrets.GOOGLE_AI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: python .github/scripts/generate_release_notes.py
