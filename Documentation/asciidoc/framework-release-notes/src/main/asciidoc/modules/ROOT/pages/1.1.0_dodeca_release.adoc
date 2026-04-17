@@ -1,0 +1,39 @@
+// use rouge for source-highlighting.
+:source-highlighter: rouge
+// apply a custom theme/style.
+:rouge-theme: github_custom
+:rouge-style: github_custom
+// autofit source globally?
+//:autofit-option:
+// define an {imagesdir} attribute relative to this file (if not already defined).
+ifndef::antora,imagesdir[:imagesdir: ../images]
+
+[#Version_1_1_0]
+ifdef::site-gen-antora[= Test Framework Version 1.1.0]
+ifndef::site-gen-antora[== Version 1.1.0]
+
+[discrete]
+== {date} - Build {buildNumber}
+'''
+
+// if using the antora backend, offset section levels by one.
+ifdef::site-gen-antora[:leveloffset: -1]
+
+[.text-justify]
+This is a test release notes file for version 1.1.0 (the current development version).
+
+//_There are no changes to the Dodeca client in this release._
+The release notes for this version contain the following items:
+//_This release contains the following changes:_
+
+* <<#1_1_0_Core_Features,Core Features>>
+
+<<<
+
+[#1_1_0_Core_Features]
+=== Core Features
+
+* Enhancement: Added multi-tenant support to the framework. #2
+
+// if using the antora backend, restore the section level offset.
+ifdef::site-gen-antora[:leveloffset: +1]
