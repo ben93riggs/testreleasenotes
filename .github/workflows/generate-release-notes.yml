@@ -23,7 +23,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install dependencies
-        run: pip install google-generativeai requests
+        run: pip install google-genai requests
 
       - name: Generate release notes
         env:

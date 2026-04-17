@@ -20,7 +20,8 @@ import subprocess
 import sys
 from pathlib import Path
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types as genai_types
 import requests
 
 # ── Configuration ──────────────────────────────────────────────────────────────
@@ -290,11 +291,7 @@ def call_gemini(
       "addin":     {"applicable": false}
     }
     """
-    genai.configure(api_key=GOOGLE_AI_API_KEY)
-    model = genai.GenerativeModel(
-        model_name="gemini-2.0-flash",
-        system_instruction=_SYSTEM_PROMPT,
-    )
+    client = genai.Client(api_key=GOOGLE_AI_API_KEY)
 
     labels_str   = ", ".join(lb["name"] for lb in issue.get("labels", [])) or "none"
     comments_str = "\n\n".join(
@@ -347,7 +344,13 @@ Return ONLY a JSON object — no markdown fences, no explanation:
 
 If applicable is false, omit section_name and entry for that product."""
 
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=prompt,
+        config=genai_types.GenerateContentConfig(
+            system_instruction=_SYSTEM_PROMPT,
+        ),
+    )
     text = response.text.strip()
     # Strip markdown code fences if the model wraps the JSON anyway
     text = re.sub(r"^```\w*\n?", "", text)
