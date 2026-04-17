@@ -22,7 +22,9 @@ ifdef::site-gen-antora[:leveloffset: -1]
 [.text-justify]
 This is a test release notes file for the release notes automation workflow.
 
-//_There are no changes to the Dodeca client in this release._
+//_This release contains the following changes:_
+
+* <<#1_0_0_Report_Grid,Report Grid>>
 The release notes for this version contain the following items:
 //_This release contains the following changes:_
 
@@ -34,6 +36,11 @@ The release notes for this version contain the following items:
 === Core Features
 
 * Enhancement: Initial release of the test framework. #1
+
+[#1_0_0_Report_Grid]
+=== Report Grid
+
+* Fixed Issue: Corrected sort order in the report grid for date columns to ensure chronological sorting when grouping. #3
 
 // if using the antora backend, restore the section level offset.
 ifdef::site-gen-antora[:leveloffset: +1]
