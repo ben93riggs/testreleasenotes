@@ -1,0 +1,29 @@
+// use rouge for source-highlighting.
+:source-highlighter: rouge
+// apply a custom theme/style.
+:rouge-theme: github_custom
+:rouge-style: github_custom
+// autofit source globally?
+//:autofit-option:
+// define an {imagesdir} attribute relative to this file (if not already defined).
+ifndef::antora,imagesdir[:imagesdir: ../images]
+
+[#Version_1_0_0]
+ifdef::site-gen-antora[= Test Add-In Version 1.0.0]
+ifndef::site-gen-antora[== Version 1.0.0]
+
+[discrete]
+== {date} - Build {buildNumber}
+'''
+
+// if using the antora backend, offset section levels by one.
+ifdef::site-gen-antora[:leveloffset: -1]
+
+[.text-justify]
+The supported versions of Excel include the following: Excel 2013, Excel 2016,
+Excel 2019, Excel 2021, and Microsoft 365 Excel for Windows Desktop.
+
+_There are no changes to the Excel Add-In in this release._
+
+// if using the antora backend, restore the section level offset.
+ifdef::site-gen-antora[:leveloffset: +1]
